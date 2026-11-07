@@ -1,4 +1,4 @@
-# GitHub Repository Monitor
+﻿# GitHub Repository Monitor
 
 End-to-end integration task: **Quartz Job → WCF → GitHub private repository → ASP.NET Core → Angular (Kendo Grid)**.
 
