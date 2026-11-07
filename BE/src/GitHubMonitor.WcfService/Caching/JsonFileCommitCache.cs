@@ -5,27 +5,6 @@ using Microsoft.Extensions.Options;
 
 namespace GitHubMonitor.WcfService.Caching;
 
-/// <summary>Immutable view of what the Quartz job last stored.</summary>
-public sealed record CommitCacheSnapshot(
-    IReadOnlyList<CommitDto> Commits,
-    DateTimeOffset? LastSyncTime,
-    DateTimeOffset? LastAttemptTime,
-    string? LastError)
-{
-    public static CommitCacheSnapshot Empty { get; } = new(Array.Empty<CommitDto>(), null, null, null);
-}
-
-public interface ICommitCache
-{
-    CommitCacheSnapshot Get();
-
-    /// <summary>Replaces the cached commits and stamps LastSyncTime.</summary>
-    Task SaveSuccessAsync(IReadOnlyList<CommitDto> commits, DateTimeOffset syncTime, CancellationToken cancellationToken = default);
-
-    /// <summary>Records a failed sync while keeping the last good commits.</summary>
-    Task SaveFailureAsync(string error, DateTimeOffset attemptTime, CancellationToken cancellationToken = default);
-}
-
 /// <summary>
 /// In-memory cache backed by a JSON file so the last sync survives service restarts.
 /// Reads are lock-free (snapshot swap); writes are serialized.

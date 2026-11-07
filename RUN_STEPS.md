@@ -16,19 +16,19 @@ Open a **new** terminal window, so `dotnet`, `node`, `npm` and `git` are on PATH
 
 ```powershell
 cd C:\@Work\ASAP
-dotnet user-secrets set "GitHub:Token" "PASTE_YOUR_NEW_TOKEN_HERE" --project src/GitHubMonitor.WcfService
+dotnet user-secrets set "GitHub:Token" "PASTE_YOUR_NEW_TOKEN_HERE" --project BE/src/GitHubMonitor.WcfService
 ```
 
 You can also run it from any folder by giving the full project path:
 
 ```powershell
-dotnet user-secrets set "GitHub:Token" "PASTE_YOUR_NEW_TOKEN_HERE" --project "C:\@Work\ASAP\src\GitHubMonitor.WcfService"
+dotnet user-secrets set "GitHub:Token" "PASTE_YOUR_NEW_TOKEN_HERE" --project "C:\@Work\ASAP\BE\src\GitHubMonitor.WcfService"
 ```
 
 To check that it's saved (this prints the token, so don't share the output):
 
 ```powershell
-dotnet user-secrets list --project "C:\@Work\ASAP\src\GitHubMonitor.WcfService"
+dotnet user-secrets list --project "C:\@Work\ASAP\BE\src\GitHubMonitor.WcfService"
 ```
 
 **Notes:**
@@ -50,7 +50,7 @@ Start them **in this order** and leave each window open.
 
 ```powershell
 cd C:\@Work\ASAP
-dotnet run --project src/GitHubMonitor.WcfService
+dotnet run --project BE/src/GitHubMonitor.WcfService
 ```
 
 - Runs on http://localhost:5100
@@ -65,7 +65,7 @@ dotnet run --project src/GitHubMonitor.WcfService
 
 ```powershell
 cd C:\@Work\ASAP
-dotnet run --project src/GitHubMonitor.Api --launch-profile http
+dotnet run --project BE/src/GitHubMonitor.Api --launch-profile http
 ```
 
 - Runs on http://localhost:5200, and Swagger is at http://localhost:5200/swagger.
@@ -75,10 +75,10 @@ dotnet run --project src/GitHubMonitor.Api --launch-profile http
 
 ### 2.3 Angular app
 
-**Path:** `C:\@Work\ASAP\src\github-monitor-ui` (in a third window)
+**Path:** `C:\@Work\ASAP\FE\github-monitor-ui` (in a third window)
 
 ```powershell
-cd C:\@Work\ASAP\src\github-monitor-ui
+cd C:\@Work\ASAP\FE\github-monitor-ui
 npm install
 npx ng serve --port 4200 --open
 ```
@@ -98,8 +98,8 @@ Press `Ctrl + C` in each window, or just close the windows.
 
 | Tests | Path | Command |
 |---|---|---|
-| .NET (20 tests) | `C:\@Work\ASAP` | `dotnet test` |
-| Angular (4 tests) | `C:\@Work\ASAP\src\github-monitor-ui` | `npx ng test --watch=false` |
+| .NET (20 tests) | `C:\@Work\ASAP\BE` | `dotnet test` |
+| Angular (4 tests) | `C:\@Work\ASAP\FE\github-monitor-ui` | `npx ng test --watch=false` |
 
 Stop the running WCF service and API before `dotnet test`. Otherwise the build fails because their files are locked.
 

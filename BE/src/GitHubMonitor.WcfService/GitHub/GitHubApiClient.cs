@@ -1,19 +1,12 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 using GitHubMonitor.Contracts;
+using GitHubMonitor.WcfService.GitHub.Responses;
 using GitHubMonitor.WcfService.Options;
 using Microsoft.Extensions.Options;
 
 namespace GitHubMonitor.WcfService.GitHub;
-
-public interface IGitHubApiClient
-{
-    /// <summary>Returns the latest commits of the configured repository, newest first.</summary>
-    /// <exception cref="GitHubApiException">GitHub could not be reached or rejected the request.</exception>
-    Task<IReadOnlyList<CommitDto>> GetLatestCommitsAsync(CancellationToken cancellationToken = default);
-}
 
 public class GitHubApiClient : IGitHubApiClient
 {
@@ -119,31 +112,4 @@ public class GitHubApiClient : IGitHubApiClient
         Date = c.Commit?.Author?.Date ?? c.Commit?.Committer?.Date ?? DateTimeOffset.MinValue,
         HtmlUrl = c.HtmlUrl
     };
-
-    // Minimal shape of GET /repos/{owner}/{repo}/commits
-    private sealed class GitHubCommitResponse
-    {
-        [JsonPropertyName("sha")] public string Sha { get; set; } = string.Empty;
-        [JsonPropertyName("html_url")] public string? HtmlUrl { get; set; }
-        [JsonPropertyName("commit")] public CommitDetail? Commit { get; set; }
-        [JsonPropertyName("author")] public GitHubUser? Author { get; set; }
-    }
-
-    private sealed class CommitDetail
-    {
-        [JsonPropertyName("message")] public string? Message { get; set; }
-        [JsonPropertyName("author")] public GitActor? Author { get; set; }
-        [JsonPropertyName("committer")] public GitActor? Committer { get; set; }
-    }
-
-    private sealed class GitActor
-    {
-        [JsonPropertyName("name")] public string? Name { get; set; }
-        [JsonPropertyName("date")] public DateTimeOffset? Date { get; set; }
-    }
-
-    private sealed class GitHubUser
-    {
-        [JsonPropertyName("login")] public string? Login { get; set; }
-    }
 }

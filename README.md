@@ -4,11 +4,11 @@ End-to-end integration task: **Quartz Job → WCF → GitHub private repository 
 
 | Part | Project | Tech |
 |---|---|---|
-| Shared WCF contract | `src/GitHubMonitor.Contracts` | `System.ServiceModel` `[ServiceContract]` / `[DataContract]` |
-| WCF service + Quartz scheduler | `src/GitHubMonitor.WcfService` | .NET 9, **CoreWCF** (SOAP, `BasicHttpBinding`), **Quartz.NET** |
-| REST API | `src/GitHubMonitor.Api` | ASP.NET Core 9 Web API, WCF client (`ChannelFactory`) |
-| Front-end | `src/github-monitor-ui` | Angular 22, **Kendo UI for Angular** (Grid, Dialog, Buttons, Card) |
-| Tests | `tests/*` | xUnit + NSubstitute (.NET), Vitest (Angular) |
+| Shared WCF contract | `BE/src/GitHubMonitor.Contracts` | `System.ServiceModel` `[ServiceContract]` / `[DataContract]` |
+| WCF service + Quartz scheduler | `BE/src/GitHubMonitor.WcfService` | .NET 9, **CoreWCF** (SOAP, `BasicHttpBinding`), **Quartz.NET** |
+| REST API | `BE/src/GitHubMonitor.Api` | ASP.NET Core 9 Web API, WCF client (`ChannelFactory`) |
+| Front-end | `FE/github-monitor-ui` | Angular 22, **Kendo UI for Angular** (Grid, Dialog, Buttons, Card) |
+| Tests | `BE/tests/*` | xUnit + NSubstitute (.NET), Vitest (Angular) |
 
 ---
 
@@ -52,7 +52,7 @@ End-to-end integration task: **Quartz Job → WCF → GitHub private repository 
   hosts it and the API consumes it through `ChannelFactory<IGitHubCommitService>`, so there is no generated proxy to drift.
 - **Quartz runs inside the WCF host** – the job and `GetScheduledCommits()` share one singleton cache, no IPC needed.
   The trigger fires on startup (`StartNow`) and then every 60 s; `[DisallowConcurrentExecution]` prevents overlapping runs.
-- **Cache = in-memory + JSON file** (`src/GitHubMonitor.WcfService/App_Data/commits-cache.json`). Writes are atomic
+- **Cache = in-memory + JSON file** (`BE/src/GitHubMonitor.WcfService/App_Data/commits-cache.json`). Writes are atomic
   (temp file + move), so the last sync survives a restart. A failed sync **keeps the last good commits** and records
   `LastSyncError` / `LastAttemptTime`, which the UI shows as a warning.
 - **Typed errors end-to-end** – GitHub failures become `FaultException<GitHubFault>` with a code
@@ -125,7 +125,7 @@ Swagger UI: http://localhost:5200/swagger
 
 ### 1. Configure the repository and token
 
-The repository is configured in `src/GitHubMonitor.WcfService/appsettings.json`:
+The repository is configured in `BE/src/GitHubMonitor.WcfService/appsettings.json`:
 
 ```json
 "GitHub": { "Owner": "ahmedabdelbadie", "Repository": "integration-task-private-repo", "CommitCount": 10, "TimeoutSeconds": 15 }
@@ -134,7 +134,7 @@ The repository is configured in `src/GitHubMonitor.WcfService/appsettings.json`:
 Store the token (once per machine):
 
 ```powershell
-dotnet user-secrets set "GitHub:Token" "<your-token>" --project src/GitHubMonitor.WcfService
+dotnet user-secrets set "GitHub:Token" "<your-token>" --project BE/src/GitHubMonitor.WcfService
 ```
 
 ### 2. Start everything
@@ -143,13 +143,13 @@ Start each part in its own terminal, from the repository root, **in this order**
 
 ```powershell
 # 1) WCF service + Quartz scheduler   → http://localhost:5100/GitHubCommitService.svc  (?wsdl, /health)
-dotnet run --project src/GitHubMonitor.WcfService
+dotnet run --project BE/src/GitHubMonitor.WcfService
 
 # 2) ASP.NET Core API                  → http://localhost:5200/swagger
-dotnet run --project src/GitHubMonitor.Api --launch-profile http
+dotnet run --project BE/src/GitHubMonitor.Api --launch-profile http
 
 # 3) Angular app                       → http://localhost:4200
-cd src/github-monitor-ui
+cd FE/github-monitor-ui
 npm install
 npx ng serve
 ```
@@ -158,17 +158,17 @@ npx ng serve
 
 1. Sign up for a free trial at https://www.telerik.com/kendo-angular-ui.
 2. Download the license key from https://www.telerik.com/account/your-licenses/license-keys.
-3. Save it as `src/github-monitor-ui/kendo-ui-license.txt` (git-ignored) or set the `KENDO_UI_LICENSE` environment variable, then run:
+3. Save it as `FE/github-monitor-ui/kendo-ui-license.txt` (git-ignored) or set the `KENDO_UI_LICENSE` environment variable, then run:
    ```powershell
-   cd src/github-monitor-ui
+   cd FE/github-monitor-ui
    npx kendo-ui-license activate
    ```
 
 ### 4. Run the tests
 
 ```powershell
-dotnet test                                   # 20 tests: GitHub client, cache, Quartz job, WCF service, API
-cd src/github-monitor-ui; npx ng test --watch=false   # 4 tests: API service, error mapping, dialog
+dotnet test BE                                # 20 tests: GitHub client, cache, Quartz job, WCF service, API
+cd FE/github-monitor-ui; npx ng test --watch=false   # 4 tests: API service, error mapping, dialog
 ```
 
 ### Ports and configuration
@@ -181,7 +181,7 @@ cd src/github-monitor-ui; npx ng test --watch=false   # 4 tests: API service, er
 | WCF endpoint used by the API | `WcfService:EndpointAddress` (API) | `http://localhost:5100/GitHubCommitService.svc` |
 | WCF call timeout | `WcfService:TimeoutSeconds` (API) | `30` |
 | Allowed CORS origins | `Cors:AllowedOrigins` (API) | `http://localhost:4200` |
-| API URL used by the UI | `src/github-monitor-ui/src/environments/environment.ts` | `http://localhost:5200` |
+| API URL used by the UI | `FE/github-monitor-ui/src/environments/environment.ts` | `http://localhost:5200` |
 
 ---
 

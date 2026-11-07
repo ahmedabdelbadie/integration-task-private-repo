@@ -31,20 +31,3 @@ public class GitHubOptions
     [Range(1, 300)]
     public int TimeoutSeconds { get; set; } = 15;
 }
-
-public class SchedulerOptions
-{
-    public const string SectionName = "Scheduler";
-
-    [Range(10, 86400)]
-    public int IntervalSeconds { get; set; } = 60;
-}
-
-public class CacheOptions
-{
-    public const string SectionName = "Cache";
-
-    /// <summary>JSON cache file; relative paths resolve against the content root.</summary>
-    [Required]
-    public string FilePath { get; set; } = "App_Data/commits-cache.json";
-}

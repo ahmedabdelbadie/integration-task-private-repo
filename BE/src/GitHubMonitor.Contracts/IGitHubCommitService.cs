@@ -18,9 +18,3 @@ public interface IGitHubCommitService
     [FaultContract(typeof(GitHubFault))]
     Task<CommitsResult> GetScheduledCommits();
 }
-
-public static class ContractNamespaces
-{
-    public const string Service = "http://asap.integration-task/github-monitor";
-    public const string Data = "http://asap.integration-task/github-monitor/data";
-}

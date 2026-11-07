@@ -1,28 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 using System.ServiceModel;
 using GitHubMonitor.Contracts;
 using Microsoft.Extensions.Options;
 
 namespace GitHubMonitor.Api.Wcf;
-
-public class WcfClientOptions
-{
-    public const string SectionName = "WcfService";
-
-    [Required, Url]
-    public string EndpointAddress { get; set; } = "http://localhost:5100/GitHubCommitService.svc";
-
-    /// <summary>Must exceed the WCF service's own GitHub timeout so GitHub timeouts surface as typed faults.</summary>
-    [Range(1, 300)]
-    public int TimeoutSeconds { get; set; } = 30;
-}
-
-/// <summary>Thin wrapper over the WCF channel so callers never deal with channel lifetime.</summary>
-public interface ICommitServiceClient
-{
-    Task<CommitsResult> GetLiveCommitsAsync();
-    Task<CommitsResult> GetScheduledCommitsAsync();
-}
 
 /// <summary>
 /// Holds one thread-safe <see cref="ChannelFactory{TChannel}"/> (expensive to build) and

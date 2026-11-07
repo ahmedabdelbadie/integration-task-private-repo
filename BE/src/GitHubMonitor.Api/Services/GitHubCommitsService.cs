@@ -5,12 +5,6 @@ using GitHubMonitor.Contracts;
 
 namespace GitHubMonitor.Api.Services;
 
-public interface IGitHubCommitsService
-{
-    Task<CommitsResponseDto> GetLiveAsync();
-    Task<CommitsResponseDto> GetScheduledAsync();
-}
-
 /// <summary>Calls the WCF service and maps its data contracts to API DTOs.</summary>
 public class GitHubCommitsService : IGitHubCommitsService
 {
