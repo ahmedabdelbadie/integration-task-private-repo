@@ -1,20 +1,11 @@
-# Starts the WCF service, the ASP.NET Core API and the Angular app, each in its own window.
-# Usage:  .\run-all.ps1            (first run: .\run-all.ps1 -Install to npm install the UI)
-param([switch]$Install)
-
+# Starts the WCF service, the API and the Angular app, each in its own window.
+# Each part can also be started on its own with run-wcf.ps1, run-api.ps1 and run-ui.ps1 (see RUN_STEPS.md).
 $root = $PSScriptRoot
-$ui = Join-Path $root 'src\github-monitor-ui'
 
-if ($Install -or -not (Test-Path (Join-Path $ui 'node_modules'))) {
-    Push-Location $ui
-    npm install
-    Pop-Location
-}
-
-Start-Process powershell -ArgumentList '-NoExit', '-Command', "Set-Location '$root'; `$Host.UI.RawUI.WindowTitle = 'WCF Service :5100'; dotnet run --project src/GitHubMonitor.WcfService"
+Start-Process powershell -ArgumentList '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $root 'run-wcf.ps1')
 Start-Sleep -Seconds 3
-Start-Process powershell -ArgumentList '-NoExit', '-Command', "Set-Location '$root'; `$Host.UI.RawUI.WindowTitle = 'API :5200'; dotnet run --project src/GitHubMonitor.Api --launch-profile http"
-Start-Process powershell -ArgumentList '-NoExit', '-Command', "Set-Location '$ui'; `$Host.UI.RawUI.WindowTitle = 'Angular :4200'; npx ng serve --port 4200 --open"
+Start-Process powershell -ArgumentList '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $root 'run-api.ps1')
+Start-Process powershell -ArgumentList '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $root 'run-ui.ps1')
 
 Write-Host ''
 Write-Host 'Starting...' -ForegroundColor Cyan
