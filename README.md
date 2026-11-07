@@ -139,11 +139,7 @@ dotnet user-secrets set "GitHub:Token" "<your-token>" --project src/GitHubMonito
 
 ### 2. Start everything
 
-```powershell
-.\run-all.ps1          # opens three windows: WCF (:5100), API (:5200), Angular (:4200)
-```
-
-Or start each part manually, **in this order**:
+Start each part in its own terminal, from the repository root, **in this order**:
 
 ```powershell
 # 1) WCF service + Quartz scheduler   → http://localhost:5100/GitHubCommitService.svc  (?wsdl, /health)

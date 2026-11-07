@@ -1,26 +1,12 @@
 # Run Steps — GitHub Repository Monitor
 
-Every command below is run in **PowerShell**, from the project folder:
+Run every command below in a terminal (PowerShell or cmd). Unless a step says otherwise, run it from the repository root:
 
 ```
 C:\@Work\ASAP
 ```
 
----
-
-## Step 0 — Open PowerShell in the project folder
-
-Open a **new** PowerShell window (so `dotnet`, `node`, `npm` and `git` are on PATH), then run:
-
-```powershell
-cd C:\@Work\ASAP
-```
-
-If PowerShell blocks the `.ps1` scripts ("running scripts is disabled on this system"), allow them for the current user once:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-```
+Open a **new** terminal window, so `dotnet`, `node`, `npm` and `git` are on PATH.
 
 ---
 
@@ -48,12 +34,13 @@ dotnet user-secrets list --project "C:\@Work\ASAP\src\GitHubMonitor.WcfService"
 **Notes:**
 - The token is stored outside the repository, in
   `%APPDATA%\Microsoft\UserSecrets\2f128527-aff1-4f8c-b6ee-a6a800008ece\secrets.json`.
+- Instead of user-secrets, you can set the `GitHub__Token` environment variable before starting the WCF service.
 - The token needs **Repository access:** only `integration-task-private-repo`, and **Contents: Read-only**.
-- If the WCF service is already running, restart it (Step 2) after changing the token.
+- If the WCF service is already running, restart it (Step 2.1) after changing the token.
 
 ---
 
-## Step 2 — Start each part separately (each in its own PowerShell window)
+## Step 2 — Start each part (each in its own terminal window)
 
 Start them **in this order** and leave each window open.
 
@@ -63,7 +50,7 @@ Start them **in this order** and leave each window open.
 
 ```powershell
 cd C:\@Work\ASAP
-.\run-wcf.ps1
+dotnet run --project src/GitHubMonitor.WcfService
 ```
 
 - Runs on http://localhost:5100
@@ -78,24 +65,25 @@ cd C:\@Work\ASAP
 
 ```powershell
 cd C:\@Work\ASAP
-.\run-api.ps1
+dotnet run --project src/GitHubMonitor.Api --launch-profile http
 ```
 
-- Runs on http://localhost:5200, and Swagger opens at http://localhost:5200/swagger.
+- Runs on http://localhost:5200, and Swagger is at http://localhost:5200/swagger.
 - Check that it's working:
   - http://localhost:5200/api/github/live
   - http://localhost:5200/api/github/scheduled
 
 ### 2.3 Angular app
 
-**Path:** `C:\@Work\ASAP` (in a third window)
+**Path:** `C:\@Work\ASAP\src\github-monitor-ui` (in a third window)
 
 ```powershell
-cd C:\@Work\ASAP
-.\run-ui.ps1
+cd C:\@Work\ASAP\src\github-monitor-ui
+npm install
+npx ng serve --port 4200 --open
 ```
 
-- The first run does `npm install`, which takes a minute.
+- `npm install` is only needed the first time, and takes a minute.
 - Runs on http://localhost:4200 and opens the browser automatically.
 - You should see "GitHub Repository Monitor" with the **Live Commits** and **Scheduled Commits** grids.
 - The Kendo "Invalid license" watermark and trial banner are expected, because no license key is activated.
@@ -103,29 +91,6 @@ cd C:\@Work\ASAP
 ### Stop
 
 Press `Ctrl + C` in each window, or just close the windows.
-
----
-
-## Alternative — start all three at once
-
-**Path:** `C:\@Work\ASAP`
-
-```powershell
-cd C:\@Work\ASAP
-.\run-all.ps1
-```
-
-This opens three windows that run `run-wcf.ps1`, `run-api.ps1` and `run-ui.ps1`.
-
----
-
-## Manual commands (without the scripts)
-
-| Part | Path | Command |
-|---|---|---|
-| WCF + Quartz | `C:\@Work\ASAP` | `dotnet run --project src/GitHubMonitor.WcfService` |
-| API | `C:\@Work\ASAP` | `dotnet run --project src/GitHubMonitor.Api --launch-profile http` |
-| Angular | `C:\@Work\ASAP\src\github-monitor-ui` | `npm install` (first time only), then `npx ng serve --port 4200 --open` |
 
 ---
 
@@ -149,4 +114,4 @@ Stop the running WCF service and API before `dotnet test`. Otherwise the build f
 | Dialog says "Service unavailable" (HTTP 503) | The WCF service isn't running. Start **2.1**. |
 | Dialog says "API unreachable" | The API isn't running. Start **2.2**. |
 | `Address already in use` / port in use | An older instance is still running. Close its window, or run `Get-Process GitHubMonitor.* \| Stop-Process`. |
-| `dotnet`, `npm` or `git` not recognized | Open a **new** PowerShell window, so it picks up the updated PATH. |
+| `dotnet`, `npm` or `git` not recognized | Open a **new** terminal window, so it picks up the updated PATH. |
