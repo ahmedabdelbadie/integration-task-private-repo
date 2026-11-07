@@ -1,0 +1,64 @@
+<div class="sections">
+  <!-- A) Live Commits -->
+  <kendo-card class="section" width="auto">
+    <kendo-card-header class="section-header">
+      <div class="heading">
+        <h2>Live Commits</h2>
+        <p class="subtitle">
+          Fetched directly from GitHub on demand
+          @if (liveFetchedAt(); as fetchedAt) {
+            · last fetched {{ fetchedAt | date: 'HH:mm:ss' }}
+          }
+        </p>
+      </div>
+      <button kendoButton themeColor="primary" [svgIcon]="icons.refresh" [disabled]="liveLoading()" (click)="refreshLive()">
+        {{ liveLoading() ? 'Refreshing…' : 'Refresh Live Data' }}
+      </button>
+    </kendo-card-header>
+    <kendo-card-body>
+      <app-commits-grid
+        [commits]="live()?.commits ?? []"
+        [loading]="liveLoading()"
+        emptyText="No live data yet. Click “Refresh Live Data” to fetch the latest commits."
+      />
+    </kendo-card-body>
+  </kendo-card>
+
+  <!-- B) Scheduled Commits -->
+  <kendo-card class="section" width="auto">
+    <kendo-card-header class="section-header">
+      <div class="heading">
+        <h2>Scheduled Commits</h2>
+        <p class="subtitle">Cached by the Quartz job (every minute) · page re-checks every {{ refreshSeconds }}s</p>
+      </div>
+      <button kendoButton fillMode="outline" [svgIcon]="icons.refresh" [disabled]="scheduledLoading()" (click)="refreshScheduled()">
+        Refresh
+      </button>
+    </kendo-card-header>
+    <kendo-card-body>
+      <div class="sync-status">
+        <kendo-svgicon [icon]="icons.clock"></kendo-svgicon>
+        <span class="label">LastSyncTime:</span>
+        @if (scheduled()?.lastSyncTime; as lastSync) {
+          <strong>{{ lastSync | date: 'dd MMM yyyy, HH:mm:ss' }}</strong>
+          <span class="ago">({{ lastSyncAgo() }})</span>
+        } @else {
+          <strong>Not synced yet</strong>
+        }
+      </div>
+
+      @if (scheduled()?.lastSyncError; as syncError) {
+        <div class="sync-warning" role="status">
+          <kendo-svgicon [icon]="icons.warning"></kendo-svgicon>
+          <span>Most recent sync failed — showing last good data. {{ syncError }}</span>
+        </div>
+      }
+
+      <app-commits-grid
+        [commits]="scheduled()?.commits ?? []"
+        [loading]="scheduledLoading() && !scheduled()"
+        emptyText="The Quartz job has not cached any commits yet."
+      />
+    </kendo-card-body>
+  </kendo-card>
+</div>

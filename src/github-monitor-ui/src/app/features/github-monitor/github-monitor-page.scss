@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+.sections {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+// Side by side on large screens.
+@media (min-width: 1400px) {
+  .sections {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.section {
+  min-width: 0; // let the grid shrink inside the CSS grid track
+}
+
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .subtitle {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--app-muted);
+  }
+}
+
+.sync-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+
+  .label {
+    color: var(--app-muted);
+  }
+
+  .ago {
+    color: var(--app-muted);
+    font-size: 0.9em;
+  }
+}
+
+.sync-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--app-warning-bg);
+  color: var(--app-warning-fg);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 575.98px) {
+  .section-header button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,42 @@
+.grid-host {
+  width: 100%;
+}
+
+.message {
+  font-weight: 500;
+}
+
+.author {
+  display: flex;
+  flex-direction: column;
+
+  .login {
+    font-size: 0.8em;
+    color: var(--app-muted);
+  }
+}
+
+.sha {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85em;
+    color: var(--app-muted);
+  }
+}
+
+.empty {
+  padding: 24px 8px;
+  color: var(--app-muted);
+}
